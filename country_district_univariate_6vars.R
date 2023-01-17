@@ -11,19 +11,13 @@
 
 
 rm(list= ls())
-output_dir<- 'X:/Spatial Stat/WASH Cholera/clean_repo/results/'
+output_dir<- dir_path
 
-# library(raster)
-# library(exactextractr)
-# library(sf)
-#library(lme4)
 library(gee)
 library(data.table)
 library(tidyrules)
 library(dplyr)
 library(ggplot2)
-#library(MASS)
-#library(AER)
 
 theme_set(theme_minimal())
 theme_update(legend.position = "bottom")
@@ -33,10 +27,6 @@ options(ggplot2.continuous.fill = "viridis")
 #####################################################################################
 ###### ------------------------------ Country Level --------------------------- #####
 #####################################################################################
-#legacy
-# ctry_p<- readRDS("X:/Spatial Stat/WASH Cholera/new_data/country.data.rds")
-# country_df<- ctry_p%>%select(mean_pop_sum, W_Imp, W_Pip, W_Sur, S_Imp, S_OD, S_Pip, total_cases.int)
-# fwrite(country_df, paste0(output_dir, 'country_6v.csv'))
 country_df<- read.csv(paste0(output_dir, 'country_6v.csv')) # created from ctry_p
 
 # function to get quasipoisson cooef and CI
@@ -57,21 +47,11 @@ country_result<- as.data.frame(country_result)
 colnames(country_result)<- c("var", "est", "lower", "upper")
 country_result<- transform(country_result, est= as.numeric(est), upper= as.numeric(upper), lower= as.numeric(lower))
 fwrite(country_result, paste0(output_dir, 'country_univariate_results.csv'))
-# country_result<- read.csv(paste0(output_dir, 'country_univariate_results.csv'))
-# ggplot(data = filter(country_result, var!='incdn__'), aes(x= as.numeric(est), y=var))+geom_pointrange(aes(xmin = as.numeric(upper), xmax = as.numeric(lower)))
-
-# country multivariate regression
-summary(glm(total_cases.int~W_Imp+W_Sur+W_Pip+S_Imp+S_Pip+S_OD, data = country_df, family = "quasipoisson", offset = log(mean_pop_sum)))
 
 
 #####################################################################################
 ###### ----------------------------- District Level --------------------------- #####
 #####################################################################################
-# legacy
-# dist_p<- readRDS("X:/Spatial Stat/WASH Cholera/clean_repo/results/dist_p.RDS")
-# district_df<- dist_p%>%select( total_cases.int, NAME_0.x, mean_pop_sum, W_Pip, W_Imp, W_Sur, S_Pip, S_Imp, S_OD, incidence_in_thousan, hotspot)
-# fwrite(district_df, paste0(output_dir, 'district_6v.csv'))
-
 # read data 
 district_df<- read.csv(paste0(output_dir, 'district_6v.csv'))
 
@@ -92,23 +72,6 @@ for (i in 4:9) {
 
 dist_result<- as.data.frame(dist_result)
 colnames(dist_result)<- c("var", "est", "lower", "upper")
-
-#ggplot(data = dist_result, aes(x= as.numeric(est), y=var))+geom_pointrange(aes(xmin = as.numeric(upper), xmax = as.numeric(lower)))
-
-
-# ----------- multivariate model - District leve
-summary(gee(total_cases.int~ 
-              W_Pip+ 
-              W_Imp+ 
-              W_Sur+ 
-              S_Pip+ 
-              S_Imp+ 
-              S_OD+ 
-              offset(log(mean_pop_sum)), 
-            data = district_df , 
-            id= as.factor(NAME_0.x),  
-            family = poisson, 
-            silent = T))$coefficients
 
 
 ######  ----------- Combine country and district regression data --------------###### 
@@ -151,11 +114,8 @@ fig2<- ggplot(data = com_df, aes(x= est, y=var, color= source))+
   scale_color_manual(values = c("#2a9d8f", '#f9c74f'))+
   theme(panel.grid.major.y =  element_blank(),legend.title = element_blank())+
   xlab("Risk Ratio")+ylab("") + 
-  #annotate("text", x= c(0.95, 1.05), y= c(8.5, 8.5), label= c("Increase of incidence", "Decrease of incidence"), size= 3)+
-  scale_y_discrete(limits= rev(levels(com_df$var))) #+
-  #annotate("text", x = c(.88), y=c(0,3.5), label = c("Sanitation \n predictor", "Water \npredictor"), angle= 90, size= 3, hjust= -.4)
-
-# ggsave(paste0(output_dir, "plots/Poisson results_6v.jpg"), width = 6, height = 4, units = "in", dpi= 400)
+  scale_y_discrete(limits= rev(levels(com_df$var)))
+  
 
 png(paste0(output_dir, 'plots/Poisson results_6v.png'), 
     width = 6, height = 4, res = 400, units = 'in')
@@ -166,8 +126,6 @@ pdf(paste0(output_dir, 'plots/Poisson results_6v.pdf'),
     width = 6, height = 4, bg= 'white')
 fig2
 dev.off()
-
-
 
 
 #--------------------- Table S2 and risk ratios for main text ----------------------
