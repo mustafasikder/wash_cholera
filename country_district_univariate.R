@@ -11,7 +11,7 @@
 
 
 rm(list= ls())
-output_dir<- dir_path
+output_dir<- 'DIRECTORY_PATH'
 
 library(gee)
 library(data.table)
