@@ -18,7 +18,6 @@ Multivariate classification models with hotspot data: `hotspot_rf_gbm_high_incid
 Aggregated population weighted water and sanitation access/reliance percentage and incidence of cholera per 1,000 by country using the estimates from [ref](https://doi.org/10.1016/S2214-109X(20)30278-3) and [ref](https://doi.org/10.1016/S0140-6736(17)33050-7) for 2010-2016.  
  
 <small>
-
 | Country |Piped Water |Other Improved Water |Piped Sanitation | Other Improved Sanitation|Unimproved water|Surface Water|Unimproved Sanitation|Open Defecation|Incidence/1,000|
 |----|-----|-----|----|-----|----|-----|-----|----|------|
 Angola|32|26.6|32.6|9.5|11.5|29.9|28.4|29.5|0.09904
